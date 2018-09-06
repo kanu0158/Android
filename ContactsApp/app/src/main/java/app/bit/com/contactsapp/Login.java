@@ -21,15 +21,15 @@ public class Login extends AppCompatActivity {
         final Context _this = Login.this;
         findViewById(R.id.loginBtn).setOnClickListener(
                 (View v)->{
-                    ItemExist exist = new ItemExist(_this);
+                    ItemExist query = new ItemExist(_this);
                     EditText x = findViewById(R.id.inputID);
                     EditText y = findViewById(R.id.inputPW);
-                    exist.id=x.getText().toString();
-                    exist.pw=y.getText().toString();
+                    query.id=x.getText().toString();
+                    query.pw=y.getText().toString();
                     new StatusService() {
                         @Override
                         public void perform() {
-                            if(exist.execute()){
+                            if(query.execute()){
                                 Toast.makeText(_this,"로그인성공",Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(_this,MemberList.class));
                             }else{

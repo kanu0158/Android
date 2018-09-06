@@ -20,13 +20,9 @@ public class Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         final Context _this = Main.this;
-        findViewById(R.id.createDB).setOnClickListener(
-                (View v)->{
-                    SQLiteHelper helper = new SQLiteHelper(_this);
-                }
-        );
         findViewById(R.id.moveLogin).setOnClickListener(
                 (View v)->{
+                    SQLiteHelper helper = new SQLiteHelper(_this);
                     this.startActivity(new Intent(_this,Login.class));
                 }
         );
@@ -76,13 +72,15 @@ public class Main extends AppCompatActivity {
             db.execSQL(sql);
             Log.d("===========================","create쿼리실행완료");
             Log.d("실행할 쿼리 :: ",sql);
+            String[] names = {"에릭감마","로드존슨","앤디루빈","존레식","라이언달"};
+            String[] emails = {"gof","spring","android","jqueryAjax","nodeJS"};
             for(int i=1;i<=5;i++){
                 db.execSQL(String.format(
                         "INSERT INTO %s " +
                                 " (%s , %s , %s , %s , %s ,  %s ) " +
                                 " VALUES ( '%s' , '%s' , '%s' , '%s' , '%s' , '%s' )"
                         ,MEMTAB, MEMNAME, MEMPW, MEMEMAIL, MEMPHONE, MEMADDR, MEMPHOTO,
-                        "홍길동"+i, "1", "hong"+i+"@test.com", "010-1234-567"+i, "신촌"+i+"길", "hong"+i+".jpg"
+                        names[i-1], "1", emails[i-1]+"@google.com", "010-1234-567"+i, "신촌"+i+"길", "profile_"+i
                 ));
             }
             Log.d("===========================","insert쿼리실행완료");
@@ -94,6 +92,4 @@ public class Main extends AppCompatActivity {
             onCreate(db);
         }
     }
-
-
 }
