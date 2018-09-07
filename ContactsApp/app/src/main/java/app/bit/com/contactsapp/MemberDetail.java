@@ -23,28 +23,75 @@ public class MemberDetail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.member_detail);
         final Context _this = MemberDetail.this;
-        Intent intent = this.getIntent();
-        String seq = intent.getExtras().getString("seq");
+        //Intent intent = this.getIntent();
+        String seq = this.getIntent().getExtras().getString("seq");
         Log.d("넘어온 seq 값 ::",seq);
-        String seq2 = intent.getStringExtra("seq");
+        String seq2 = this.getIntent().getStringExtra("seq");
         Log.d("넘어온 seq2 값 ::",seq2);
-        ItemRetrieve query = new ItemRetrieve(_this,seq);
+        ItemRetrieve query = new ItemRetrieve(_this);
+        query.seq = seq;
         Member m = (Member) new RetrieveService(){
             @Override
             public Object perform() {
                 return query.execute();
             }
         }.perform();
+
         Log.d("================================","====================");
-        Log.d("디테일 MEMBER : ",m.seq+"|"+m.name+"|"+m.email+"|"+m.phone+"|"+m.photo);
+        Log.d("디테일 MEMBER : ",m.seq+"|"+m.name+"|"+m.email+"|"+m.phone+"|"+m.photo+"|"+m.addr);
         TextView name = findViewById(R.id.name);
         name.setText(m.name);
-        ImageView v = findViewById(R.id.profile);
-        v.setImageResource(R.drawable.profile_1);
+        ImageView profile = findViewById(R.id.profile);
+        //profile.setImageResource(R.drawable.profile_1);
+        profile.setImageDrawable(getResources().getDrawable(getResources().getIdentifier(this.getPackageName()+":drawable/"+m.photo,null,null),_this.getTheme()));
         TextView phone = findViewById(R.id.phone);
         phone.setText(m.phone);
         TextView email = findViewById(R.id.email);
         email.setText(m.email);
+        TextView addr = findViewById(R.id.addr);
+        addr.setText(m.addr);
+
+        findViewById(R.id.updateBtn).setOnClickListener(
+                (View v)->{
+                    Intent moveUpdate = new Intent(_this,MemberUpdate.class);
+                    moveUpdate.putExtra("seq",seq);
+                    moveUpdate.putExtra("name",m.name);
+                    moveUpdate.putExtra("email",m.email);
+                    moveUpdate.putExtra("phone",m.phone);
+                    moveUpdate.putExtra("addr",m.addr);
+                    moveUpdate.putExtra("profile",m.photo);
+                    startActivity(moveUpdate);
+                }
+        );
+
+        findViewById(R.id.callBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.dialBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.smsBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.emailBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.albumBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.movieBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.mapBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.musicBtn).setOnClickListener(
+                (View v)->{}
+        );
+        findViewById(R.id.listBtn).setOnClickListener(
+                (View v)->{}
+        );
+
     }
 
     private class RetrieveQuery extends QueryFactory {
@@ -58,11 +105,10 @@ public class MemberDetail extends AppCompatActivity {
             return helper.getReadableDatabase();
         }
     }
-    private  class ItemRetrieve extends RetrieveQuery{
+    private class ItemRetrieve extends RetrieveQuery{
         String seq;
-        public ItemRetrieve(Context _this,String seq) {
+        public ItemRetrieve(Context _this) {
             super(_this);
-            this.seq = seq;
         }
         public Member execute(){
             Member m = null;
@@ -76,9 +122,10 @@ public class MemberDetail extends AppCompatActivity {
                     m.phone = cursor.getString(cursor.getColumnIndex(MEMPHONE));
                     m.photo = cursor.getString(cursor.getColumnIndex(MEMPHOTO));
                     m.email = cursor.getString(cursor.getColumnIndex(MEMEMAIL));
+                    m.addr = cursor.getString(cursor.getColumnIndex(MEMADDR));
                 }
                 Log.d("================================","====================");
-                Log.d("디테일 if true : ",m.seq+"|"+m.name+"|"+m.email+"|"+m.phone+"|"+m.photo);
+                Log.d("디테일 if true : ",m.seq+"|"+m.name+"|"+m.email+"|"+m.phone+"|"+m.photo+"|"+m.addr);
             }else{
                 Log.d("================================","====================");
                 Log.d("디테일 if false ","입니다.");

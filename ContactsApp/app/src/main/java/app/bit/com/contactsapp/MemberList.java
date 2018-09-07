@@ -1,10 +1,12 @@
 package app.bit.com.contactsapp;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,13 +48,80 @@ public class MemberList extends AppCompatActivity {
                startActivity(intent);
             }
         );
+
+        memberList.setOnItemLongClickListener(
+                (AdapterView<?> p, View v, int i, long l)->{
+                    //Toast.makeText(_this,"길게 눌렀다!!",Toast.LENGTH_LONG).show();
+                    Log.d("======길게 눌렀다","====================");
+                    Member m = (Member)memberList.getItemAtPosition(i);
+                    new AlertDialog.Builder(_this)
+                            .setTitle("DELETE")
+                            .setMessage("정말로 삭제할까요?")
+                            .setPositiveButton(
+                                    android.R.string.yes,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Toast.makeText(_this,"삭제실행 !",Toast.LENGTH_LONG).show();
+                                            ItemDelete query = new ItemDelete(_this);
+                                            query.m.seq = m.seq;
+                                            new StatusService(){
+
+                                                @Override
+                                                public void perform() {
+                                                    query.execute();
+                                                }
+                                            }.perform();
+                                            startActivity(new Intent(_this,MemberList.class));
+                                        }
+                                    }
+                            )
+                            .setNegativeButton(
+                                    android.R.string.no,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Toast.makeText(_this,"삭제 취소 !",Toast.LENGTH_LONG).show();
+                                            Log.d("=========삭제취소","================");
+                                        }
+                                    }
+                            ).show();
+                    return true;
+                }
+        );
+    }
+    private class DeleteQuery extends QueryFactory{
+        SQLiteOpenHelper helper;
+        public DeleteQuery(Context _this) {
+            super(_this);
+            helper = new SQLiteHelper(_this);
+        }
+
+        @Override
+        public SQLiteDatabase getDatabase() {
+            return helper.getWritableDatabase();
+        }
+    }
+
+    private class ItemDelete extends DeleteQuery{
+        Member m;
+        public ItemDelete(Context _this) {
+            super(_this);
+            m = new Member();
+        }
+        public void execute(){
+            getDatabase().execSQL(String.format(
+                    " DELETE FROM %s " +
+                    " WHERE %s LIKE '%s' ",MEMTAB,MEMSEQ,m.seq
+            ));
+        }
     }
 
     private class ListQuery extends Main.QueryFactory {
         SQLiteOpenHelper helper;
         public ListQuery(Context _this) {
             super(_this);
-            helper=new Main.SQLiteHelper(_this);
+            helper=new SQLiteHelper(_this);
         }
 
         @Override
