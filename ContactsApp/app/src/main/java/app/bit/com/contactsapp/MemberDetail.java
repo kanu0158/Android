@@ -11,8 +11,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import app.bit.com.contactsapp.util.PhoneUtil;
+import app.bit.com.contactsapp.util.SMSUtil;
 
 import static app.bit.com.contactsapp.Main.*;
 
@@ -65,13 +69,27 @@ public class MemberDetail extends AppCompatActivity {
         );
 
         findViewById(R.id.callBtn).setOnClickListener(
-                (View v)->{}
+                (View v)->{
+                    PhoneUtil util = new PhoneUtil(_this,this);
+                    Log.d("===============================1","=======================");
+                    util.setPhoneNum(phone.getText().toString());
+                    Log.d("===============================2","=======================");
+                    util.call();
+                    Log.d("===============================3","=======================");
+                }
         );
         findViewById(R.id.dialBtn).setOnClickListener(
-                (View v)->{}
+                (View v)->{
+                    PhoneUtil util = new PhoneUtil(_this,this);
+                    Toast.makeText(_this,"전화번호:"+phone.getText().toString(),Toast.LENGTH_LONG).show();
+                    util.setPhoneNum(phone.getText().toString());
+                    util.dial();
+                }
         );
         findViewById(R.id.smsBtn).setOnClickListener(
-                (View v)->{}
+                (View v)->{
+                    SMSUtil util = new SMSUtil(_this,this);
+                }
         );
         findViewById(R.id.emailBtn).setOnClickListener(
                 (View v)->{}

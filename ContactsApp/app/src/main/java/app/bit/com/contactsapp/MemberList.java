@@ -34,6 +34,14 @@ public class MemberList extends AppCompatActivity {
         final Context _this = MemberList.this;
         ItemList query = new ItemList(_this);
         ListView memberList = findViewById(R.id.memberList);
+
+        findViewById(R.id.addBtn).setOnClickListener(
+                (View v)->{
+                    startActivity(new Intent(_this, MemberAdd.class));
+                }
+
+        );
+
         memberList.setAdapter(new MemberAdapter(_this,(ArrayList<Member>)new ListService() {
             @Override
             public List<?> perform() {
@@ -164,18 +172,13 @@ public class MemberList extends AppCompatActivity {
     private class MemberAdapter extends BaseAdapter{
         ArrayList<Member> list;
         LayoutInflater inflater;
+        Context _this;
 
         public MemberAdapter(Context _this,ArrayList<Member> list) {
             this.list = list;
             this.inflater = LayoutInflater.from(_this);
+            this._this = _this;
         }
-        private int[] photos = {
-            R.drawable.profile_1,
-            R.drawable.profile_2,
-            R.drawable.profile_3,
-            R.drawable.profile_4,
-            R.drawable.profile_5
-        };
 
         @Override
         public int getCount() {
@@ -205,7 +208,23 @@ public class MemberList extends AppCompatActivity {
             }else{
                 holder = (ViewHolder) v.getTag();
             }
-            holder.profile.setImageResource(photos[i]);
+            ItemProfile query = new ItemProfile(_this);
+            query.seq = list.get(i).seq+"";
+            holder.profile
+                    .setImageDrawable(
+                            getResources().getDrawable(
+                                    getResources().getIdentifier(
+                                            _this.getPackageName()+":drawable/"
+                                                    + (new RetrieveService() {
+                                                @Override
+                                                public Object perform() {
+                                                    return query.execute();
+                                                }
+                                            }.perform())
+                                            , null, null
+                                    ), _this.getTheme()
+                            )
+                    );
             holder.name.setText(list.get(i).name);
             holder.phone.setText(list.get(i).phone);
             return v;
@@ -215,5 +234,35 @@ public class MemberList extends AppCompatActivity {
         ImageView profile;
         TextView name, phone;
     }
+    private class MemberProfileQuery extends QueryFactory{
+        SQLiteOpenHelper helper;
+        public MemberProfileQuery(Context _this) {
+            super(_this);
+            helper = new SQLiteHelper(_this);
+        }
 
+        @Override
+        public SQLiteDatabase getDatabase() {
+            return helper.getReadableDatabase();
+        }
+    }
+    private class ItemProfile extends MemberProfileQuery{
+        String seq;
+        public ItemProfile(Context _this) {
+            super(_this);
+        }
+        public String execute(){
+            Cursor c = getDatabase()
+                    .rawQuery(String.format(
+                            " SELECT %s FROM %s WHERE %s LIKE '%s' "
+                            , MEMPHOTO, MEMTAB, MEMSEQ, seq),null);
+            String result = "";
+            if(c != null){
+                if(c.moveToNext()){
+                    result = c.getString(c.getColumnIndex(MEMPHOTO));
+                }
+            }
+            return result;
+        }
+    }
 }
